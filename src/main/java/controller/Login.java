@@ -4,6 +4,7 @@
  */
 package controller;
 
+import dao.TaiKhoanDAO;
 import java.io.IOException;
 import java.io.PrintWriter;
 import javax.servlet.ServletException;
@@ -12,6 +13,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import model.TaiKhoan;
 
 /**
  *
@@ -32,15 +34,18 @@ public class Login extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
-           String username = request.getParameter("username");
+        String username = request.getParameter("username");
         String password = request.getParameter("password");
-        if (username.equalsIgnoreCase("admin") && password.equals("admin")) 
-        {
+        
+        TaiKhoanDAO tkDAO=new TaiKhoanDAO();
+        TaiKhoan tk=tkDAO.checkLogin(username, password);
+        
+        
+        if (tk!=null) {
             HttpSession session = request.getSession();
             session.setAttribute("username", username);
-            response.sendRedirect("home.jsp"); 
-        } else
-        {
+            response.sendRedirect("home.jsp");
+        } else {
             request.setAttribute("error", "Đăng nhập thất bại do sai tên đăng nhập hoặc mật khẩu");
             request.getRequestDispatcher("login.jsp").forward(request, response);
         }
@@ -49,7 +54,7 @@ public class Login extends HttpServlet {
             out.println("<!DOCTYPE html>");
             out.println("<html>");
             out.println("<head>");
-            out.println("<title>Servlet Login</title>");            
+            out.println("<title>Servlet Login</title>");
             out.println("</head>");
             out.println("<body>");
             out.println("<h1>Servlet Login at " + request.getContextPath() + "</h1>");
